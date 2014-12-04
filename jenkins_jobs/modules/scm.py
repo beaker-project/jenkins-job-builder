@@ -72,6 +72,8 @@ remoteName/\*')
              (default: workspace)
     :arg bool skip-tag: Skip tagging (default false)
     :arg bool shallow-clone: Perform shallow clone (default false)
+    :arg list(str) sparse-checkout: Perform sparse checkout of the
+      given paths (default full checkout)
     :arg bool prune: Prune remote branches (default false)
     :arg bool clean: Clean after checkout (default false)
 
@@ -304,6 +306,14 @@ remoteName/\*')
         if clean_before:
             ext_name = 'hudson.plugins.git.extensions.impl.CleanBeforeCheckout'
             ext = XML.SubElement(exts_node, ext_name)
+    if 'sparse-checkout' in data:
+        ext_name = 'hudson.plugins.git.extensions.impl.SparseCheckoutPaths'
+        ext = XML.SubElement(exts_node, ext_name)
+        paths = XML.SubElement(ext, 'sparseCheckoutPaths')
+        for path in data['sparse-checkout']:
+            elem_name = 'hudson.plugins.git.extensions.impl.SparseCheckoutPath'
+            path_node = XML.SubElement(paths, elem_name)
+            XML.SubElement(path_node, 'path').text = path
     if 'submodule' in data:
         ext_name = 'hudson.plugins.git.extensions.impl.SubmoduleOption'
         ext = XML.SubElement(exts_node, ext_name)
