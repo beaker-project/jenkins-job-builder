@@ -1351,7 +1351,7 @@ def critical_block_start(parser, xml_parent, data):
       wrappers:
         - exclusion:
             resources:
-              myresource1
+              - myresource1
       builders:
         - critical-block-start
         - ... other builders
@@ -1379,7 +1379,7 @@ def critical_block_end(parser, xml_parent, data):
       wrappers:
         - exclusion:
             resources:
-              myresource1
+              - myresource1
       builders:
         - critical-block-start
         - ... other builders
