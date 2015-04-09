@@ -2472,6 +2472,70 @@ def github_pull_request(parser, xml_parent, data):
             convert_mapping_to_xml(
                 result_tag, status, status_mapping, fail_required=True)
 
+def base_publish_over(xml_parent, data, console_prefix,
+                      plugin_tag, inner_plugin_tag, publisher_tag,
+                      transferset_tag, reference_plugin_tag):
+    plugin = XML.SubElement(xml_parent, plugin_tag)
+    inner_plugin = XML.SubElement(plugin, inner_plugin_tag)
+    XML.SubElement(inner_plugin, 'consolePrefix').text = console_prefix
+    delegate = XML.SubElement(inner_plugin, 'delegate')
+    publishers = XML.SubElement(delegate, 'publishers')
+    inner = XML.SubElement(publishers, publisher_tag)
+    XML.SubElement(inner, 'configName').text = data['site']
+    XML.SubElement(inner, 'verbose').text = 'true'
+
+    transfers = XML.SubElement(inner, 'transfers')
+    transfersset = XML.SubElement(transfers, transferset_tag)
+    XML.SubElement(transfersset, 'remoteDirectory').text = data['target']
+    XML.SubElement(transfersset, 'sourceFiles').text = data['source']
+    if 'command' in data:
+        XML.SubElement(transfersset, 'execCommand').text = data['command']
+    if 'timeout' in data:
+        XML.SubElement(transfersset, 'execTimeout').text = str(data['timeout'])
+    if 'use-pty' in data:
+        XML.SubElement(transfersset, 'usePty').text = \
+            str(data.get('use-pty', False)).lower()
+    XML.SubElement(transfersset, 'excludes').text = data.get('excludes', '')
+    XML.SubElement(transfersset, 'removePrefix').text = \
+        data.get('remove-prefix', '')
+    XML.SubElement(transfersset, 'remoteDirectorySDF').text = \
+        str(data.get('target-is-date-format', False)).lower()
+    XML.SubElement(transfersset, 'flatten').text = \
+        str(data.get('flatten', False)).lower()
+    XML.SubElement(transfersset, 'cleanRemote').text = \
+        str(data.get('clean-remote', False)).lower()
+
+    XML.SubElement(inner, 'useWorkspaceInPromotion').text = 'false'
+    XML.SubElement(inner, 'usePromotionTimestamp').text = 'false'
+    XML.SubElement(delegate, 'continueOnError').text = 'false'
+    XML.SubElement(delegate, 'failOnError').text = \
+        str(data.get('fail-on-error', False)).lower()
+    XML.SubElement(delegate, 'alwaysPublishFromMaster').text = \
+        str(data.get('always-publish-from-master', False)).lower()
+    XML.SubElement(delegate, 'hostConfigurationAccess',
+                   {'class': reference_plugin_tag,
+                    'reference': '../..'})
+    return (plugin, transfersset)
+
+def publish_over_ssh_post_build(parser, xml_parent, data):
+    """yaml: publish-over-ssh-post-build
+    """
+    console_prefix = 'SSH: '
+    plugin_tag = 'jenkins.plugins.publish__over__ssh.BapSshPostBuildWrapper'
+    inner_plugin_tag = 'postBuild'
+    publisher_tag = 'jenkins.plugins.publish__over__ssh.BapSshPublisher'
+    transfer_tag = 'jenkins.plugins.publish__over__ssh.BapSshTransfer'
+    plugin_reference_tag = 'jenkins.plugins.publish_over_ssh.'\
+        'BapSshAlwaysRunPublisherPlugin'
+    base_publish_over(xml_parent,
+                      data,
+                      console_prefix,
+                      plugin_tag,
+                      inner_plugin_tag,
+                      publisher_tag,
+                      transfer_tag,
+                      plugin_reference_tag)
+
 
 class Wrappers(jenkins_jobs.modules.base.Base):
     sequence = 80
