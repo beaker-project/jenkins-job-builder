@@ -226,7 +226,7 @@ class JJBConfig(object):
         self.excludes = config.get('job_builder', 'exclude').split(os.pathsep)
 
         # The way we want to do things moving forward:
-        self.jenkins['url'] = config.get('jenkins', 'url')
+        self.jenkins['url'] = config.get('jenkins', 'url').encode('ascii')
         self.jenkins['user'] = self.user
         self.jenkins['password'] = self.password
         self.jenkins['timeout'] = self.timeout
