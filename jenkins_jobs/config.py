@@ -268,7 +268,7 @@ class JJBConfig(object):
         self.excludes = config.get('job_builder', 'exclude').split(os.pathsep)
 
         # The way we want to do things moving forward:
-        self.jenkins['url'] = config.get(self._section, 'url')
+        self.jenkins['url'] = config.get('jenkins', 'url').encode('ascii')
         self.builder['print_job_urls'] = self.print_job_urls
 
         # keep descriptions ? (used by yamlparser)

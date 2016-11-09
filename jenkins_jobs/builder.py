@@ -46,6 +46,7 @@ class JenkinsManager(object):
 
     def __init__(self, jjb_config):
         url = jjb_config.jenkins['url']
+        assert not isinstance(url, unicode)
         user = jjb_config.jenkins['user']
         password = jjb_config.jenkins['password']
         timeout = jjb_config.jenkins['timeout']
